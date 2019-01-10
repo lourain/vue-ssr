@@ -5,7 +5,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
 const VueSSRServerPlugin = require('vue-server-renderer/client-plugin')
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 console.log(__dirname);
 
 module.exports = {
@@ -19,11 +19,12 @@ module.exports = {
         // libraryTarget:'commonjs2'
     },
     devServer:{
-        contentBase:"../dist",
-        // history
+        contentBase:false,
+        publicPath:'/',
+        historyApiFallback:true
     },
     plugins: [
-        // new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin(['dist']),
         new HtmlWebpackPlugin({
             title: 'development',
             template:path.resolve(__dirname,'../template.html')
@@ -35,6 +36,12 @@ module.exports = {
         new VueLoaderPlugin(),
         new VueSSRServerPlugin(),
         // new ExtractTextPlugin("styles.css")
+        new CopyWebpackPlugin([
+            {
+                from:require('path').join(__dirname,'../assets'),
+                to:'assets'
+            }
+        ])
     ],
     module: {
 
@@ -51,6 +58,10 @@ module.exports = {
                         {loader:'css-loader'}
                     ]
                 // })
+            },
+            {
+                test:/\.less$/,
+                use:['style-loader','css-loader','less-loader']
             },
             {
                 test: /\.js$/,
